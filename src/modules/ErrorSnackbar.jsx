@@ -21,8 +21,7 @@ const mapStateToProps = state => ({
   err: state.err,
 });
 
-@connect(mapStateToProps)
-export default class ErrorSnackbar extends React.Component {
+export class ErrorSnackbar extends React.Component {
   constructor() {
     super();
     this.state = {
@@ -121,6 +120,8 @@ export default class ErrorSnackbar extends React.Component {
     );
   }
 }
+
+export default connect(mapStateToProps)(ErrorSnackbar);
 
 // Action creators
 export const showError = createAction('Show error message');
