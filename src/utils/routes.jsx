@@ -45,14 +45,16 @@ import Logout from '../modules/Logout';
 
 // Routes
 const routeConfigs = [{
-  path: '/home',
+  path: '/',
   name: 'Home',
+  exact: true,
   component: Home,
   icon: HomeIcon,
-  requiresLogin: false,
+  requiresLogin: true,
 }, {
   path: '/login',
   name: 'Login',
+  exact: true,
   component: Login,
   icon: LoginIcon,
   requiresLogin: false,
@@ -60,6 +62,7 @@ const routeConfigs = [{
 }, {
   path: '/logout',
   name: 'Logout',
+  exact: true,
   component: Logout,
   icon: LogoutIcon,
   requiresLogin: false,
@@ -109,44 +112,12 @@ class AuthRedirectRoute extends React.Component {
     const { component: ChildComponent, loggedIn, requiresLogin, ...rest } = this.props;
 
     return (
-      <Route
-        {...rest}
-        render={props => (
-          !requiresLogin || loggedIn ? (
-            <ChildComponent {...props} />
-          ) : (
-            <Redirect
-              to={{
-                pathname: '/login',
-                state: { from: props.location },
-              }}
-            />
-          )
-        )}
-      />
+      (!requiresLogin || loggedIn)
+        ? <Route {...rest} render={props => (<ChildComponent {...props} />)}/>
+        : <Redirect to={{ pathname: '/login', state: { from: this.props.location } }} />
     );
   }
 }
-
-// AuthRedirectRoute wrapper which mounts routeConfig at '/' regardless of configured path
-export const IndexRoute = ({ routeConfig, ...rest }) => {
-  const indexRoute = {
-    ...routeConfig,
-    path: '/',
-  };
-
-  return (
-    <AuthRedirectRoute
-      exact
-      {...rest}
-      {...indexRoute}
-    />
-  );
-};
-
-IndexRoute.propTypes = {
-  routeConfig: RouteConfigShape.isRequired,
-};
 
 // Map all configured routes into AuthRedirectRoute components
 export const ConfiguredRoutes = ({ ...rest }) => (
