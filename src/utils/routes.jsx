@@ -47,10 +47,9 @@ import Logout from '../modules/Logout';
 const routeConfigs = [{
   path: '/',
   name: 'Home',
-  exact: true,
   component: Home,
   icon: HomeIcon,
-  requiresLogin: true,
+  requiresLogin: false,
 }, {
   path: '/login',
   name: 'Login',
