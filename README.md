@@ -26,3 +26,7 @@ and additionally includes:
 * [redux-api](https://github.com/lexich/redux-api), store REST API responses and status in redux
 * [react-router-redux](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-redux), sync router state with redux
 * [redux-act](https://github.com/pauldijou/redux-act), use actions themselves as references inside reducers
+
+### Styling
+
+If you need SASS or LESS support, just create .env file in project root and set variable REACT_APP_SASS=true or REACT_APP_LESS=true depending on what you need.
