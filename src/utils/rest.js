@@ -18,7 +18,7 @@ Information about request: `state.teams.error`, `state.teams.sync`, `state.teams
 let apiRoot;
 
 if (process.env.NODE_ENV === 'development') {
-  apiRoot = 'https://rws.stage.mqd.me/api';
+  apiRoot = 'https://stage.mqd.me/api';
 } else {
   apiRoot = 'https://prod.mqd.me/api';
 }
