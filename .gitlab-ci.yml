@@ -1,0 +1,7 @@
+test:
+  cache:
+    untracked: true
+  only:
+    - develop
+  script:
+    - sonar.sh
