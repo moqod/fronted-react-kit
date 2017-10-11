@@ -1,14 +1,8 @@
-import reduxApi, { transformers } from 'redux-api';
+import reduxApi from 'redux-api';
+// import { transformers } from 'redux-api';
 import adapterFetch from 'redux-api/lib/adapters/fetch';
-import jwtDecode from 'jwt-decode';
 
-import { showError } from '../modules/ErrorSnackbar';
-
-let store;
-
-export const injectStore = (_store) => {
-  store = _store;
-};
+// import { showError } from '../modules/ErrorSnackbar';
 
 /*
 // Endpoint configurations
@@ -24,9 +18,9 @@ Information about request: `state.teams.error`, `state.teams.sync`, `state.teams
 let apiRoot;
 
 if (process.env.NODE_ENV === 'development') {
-  apiRoot = 'http://localhost:3888';
+  apiRoot = 'https://stage.mqd.me/api';
 } else {
-  apiRoot = 'https://my-app.herokuapp.com';
+  apiRoot = 'https://prod.mqd.me/api';
 }
 
 const rest = reduxApi({
@@ -53,12 +47,11 @@ const rest = reduxApi({
   */
 
   auth: {
-    url: `${apiRoot}/users/authenticate`,
+    url: `${apiRoot}/login/`,
     transformer: (data = {}) => {
       if (data.token) {
         return {
-          ...data,
-          decoded: jwtDecode(data.token),
+          ...data
         };
       }
       return data;
@@ -79,7 +72,7 @@ const rest = reduxApi({
 
   // Add token to request headers
   if (token) {
-    return { headers: { ...headers, Authorization: `Bearer ${token}` } };
+    return { headers: { ...headers, Authorization: `${token}` } };
   }
 
   return { headers };
@@ -97,10 +90,12 @@ const rest = reduxApi({
 
     // error description
     msg += err.message ? `: ${err.message}` : '';
-    store.dispatch(showError({
-      msg,
-      details: JSON.stringify(err, Object.getOwnPropertyNames(err), 4),
-    }));
+
+    console.error('Error:', msg)
+    // store.dispatch(showError({
+    //   msg,
+    //   details: JSON.stringify(err, Object.getOwnPropertyNames(err), 4),
+    // }));
 
     throw err;
   }
