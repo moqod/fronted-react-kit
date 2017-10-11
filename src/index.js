@@ -1,115 +1,45 @@
-import 'typeface-roboto';
-
-import Offline from 'offline-plugin/runtime';
 import React from 'react';
+import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { render } from 'react-dom';
-import { ConnectedRouter } from 'react-router-redux';
+import { combineReducers, createStore, compose, applyMiddleware } from 'redux';
+import thunkMiddleware from 'redux-thunk';
 
-// import injectTapEventPlugin from 'react-tap-event-plugin';
-
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import createMuiTheme from 'material-ui/styles/theme';
+import {
+  BrowserRouter as Router,
+  Route
+} from 'react-router-dom';
 
 import { IntlProvider } from 'react-intl-redux';
 
+
+import App from './components/App';
+import Login from './components/Login';
+import PrivateRoute from './utils/PrivateRoute';
+
+import { reducer as intl } from './utils/intl';
+import { reducers as restReducers } from './utils/rest';
+
+import registerServiceWorker from './registerServiceWorker';
+import 'typeface-roboto';
 import './index.css';
 
-import ErrorSnackbar from './modules/ErrorSnackbar';
-import NavigationDrawer from './modules/NavigationDrawer';
-import Header from './modules/Header';
-import FullscreenSpinner from './components/FullscreenSpinner';
+const reducer = combineReducers({
+  intl,
+  ...restReducers
+});
 
-import { ConfiguredRoutes } from './utils/routes';
+const store = createStore(reducer, undefined, compose(applyMiddleware(thunkMiddleware)));
 
-import store from './utils/store';
-import persistStore from './utils/persist';
-
-import { history } from './utils/middleware/router';
-import theme from './utils/theme';
-
-const muiTheme = createMuiTheme(theme);
-
-// Needed for onClick
-// http://stackoverflow.com/a/34015469/988941
-/*
-try {
-  injectTapEventPlugin();
-} catch (e) {
-  // ignore errors
-  // otherwise we break hot reloading
-}
-*/
-
-// offline-plugin: Apply updates immediately
-// https://github.com/NekR/offline-plugin/blob/master/docs/updates.md
-if (process.env.NODE_ENV === 'production') {
-  Offline.install({
-    onUpdating: () => {
-      // console.log('SW Event:', 'onUpdating');
-    },
-
-    onUpdateReady: () => {
-      // console.log('SW Event:', 'onUpdateReady');
-      // Tells to new SW to take control immediately
-      Offline.applyUpdate();
-    },
-
-    onUpdated: () => {
-      // console.log('SW Event:', 'onUpdated');
-      // Reload the webpage to load into the new version
-      window.location.reload();
-    },
-
-    onUpdateFailed: () => {
-      // TODO: alert user
-      // console.log('SW Event:', 'onUpdateFailed');
-    },
-  });
-}
-
-export default class App extends React.Component {
-  state = { rehydrated: false };
-
-  componentWillMount() {
-    persistStore(store, () => this.setState({ rehydrated: true }));
-  }
-
-  renderApp = () => (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <NavigationDrawer />
-      <Header />
-
-      <ConfiguredRoutes />
-
-      <ErrorSnackbar />
-    </div>
-  );
-
-  renderLoading = () => (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <FullscreenSpinner />
-    </div>
-  );
-
-  render() {
-    const { rehydrated } = this.state;
-
-    return (
-      <MuiThemeProvider theme={muiTheme}>
-        <Provider store={store}>
-          <IntlProvider>
-            <ConnectedRouter history={history}>
-              { rehydrated
-                ? this.renderApp()
-                : this.renderLoading()
-              }
-            </ConnectedRouter>
-          </IntlProvider>
-        </Provider>
-      </MuiThemeProvider>
-    );
-  }
-}
-
-render(<App />, document.getElementById('root'));
+ReactDOM.render(
+  <Provider store={store}>
+    <IntlProvider>
+      <Router>
+        <div>
+          <PrivateRoute path="/" component={App}/>
+          <Route path="/login" component={Login}/>
+        </div>
+      </Router>
+    </IntlProvider>
+  </Provider>, document.getElementById('root')
+);
+registerServiceWorker();

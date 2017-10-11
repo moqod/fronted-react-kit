@@ -1,18 +1,8 @@
 export default {
   // Navigation
-  navigation: 'Navigaatio',
   Home: 'Koti',
-  Users: 'Käyttäjät',
-  Preferences: 'Asetukset',
   Logout: 'Kirjaudu ulos',
   Login: 'Kirjaudu sisään',
-
-  // Users view
-  userId: 'ID',
-  email: 'Sähköpostiosoite',
-  description: 'Kuvaus',
-  showUserDetails: 'Lisätiedot',
-  userDetails: 'Käyttäjän lisätiedot',
 
   // Preferences view
   language: 'Sovelluksen kieli',
