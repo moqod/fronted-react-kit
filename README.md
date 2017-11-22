@@ -27,4 +27,4 @@ and additionally includes:
 
 ### Styling
 
-* [styled-components](https://www.styled-components.com) Use the best bits of ES6 and CSS to style your apps
+* [styled-components](https://www.styled-components.com) Use the best bits of ES6 and CSS to style your apps without preprocessors
