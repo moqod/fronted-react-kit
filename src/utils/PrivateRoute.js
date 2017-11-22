@@ -8,10 +8,12 @@ import {
 class PrivateRoute extends Component {
   render() {
     const { component: Component, loggedIn, ...rest } = this.props;
-    console.log('Render Private Route', loggedIn)
+    let token = localStorage.getItem('auth_token');
+    token = token ? token.trim().replace(/"/g, '') : token;
+    console.log('Private route', token, loggedIn)
     return (
       <Route {...rest} render={props => (
-    loggedIn ? (
+    (loggedIn || token) ? (
       <Component {...props}/>
     ) : (
       <Redirect to={{
@@ -25,7 +27,7 @@ class PrivateRoute extends Component {
 }
 
 const mapStateToProps = state => ({
-  loggedIn: !!state.auth.data.token,
+  loggedIn: !!state.auth.token,
 });
 
 export default connect(mapStateToProps)(PrivateRoute);
