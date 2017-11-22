@@ -1,105 +1,26 @@
-import reduxApi from 'redux-api';
-// import { transformers } from 'redux-api';
-import adapterFetch from 'redux-api/lib/adapters/fetch';
+import axios from 'axios'
 
-// import { showError } from '../modules/ErrorSnackbar';
+let apiHost = process.env.API_HOST || 'https://rws.mqd.me/api/';
+let headers = {};
 
-/*
-// Endpoint configurations
-These example endpoints can be called by dispatching the respective actions, e.g:
-
-dispatch(rest.actions.teams.post({teamId: 42}, { body: JSON.stringify(exampleData) }));
-Results in: POST /teams?teamId=42 with POST data from 'exampleData'
-
-Result of request can be found in: `state.teams.data`
-Information about request: `state.teams.error`, `state.teams.sync`, `state.teams.error`...
-*/
-
-let apiRoot;
-
-if (process.env.NODE_ENV === 'development') {
-  apiRoot = 'https://stage.mqd.me/api';
-} else {
-  apiRoot = 'https://prod.mqd.me/api';
+let token = localStorage.getItem('auth_token');
+token = token ? token.trim().replace(/"/g, '') : token;
+if (token) {
+  headers = {
+    'Authorization': 'Token ' + token
+  }
 }
 
-const rest = reduxApi({
-  // Add more API endpoints here! Examples below:
-
-  /*
-  // Endpoints which return an array (data defaults to [])
-  teams: {
-    url: `${apiRoot}/teams`,
-    transformer: transformers.array,
-    crud: true,
-  },
-  companies: {
-    url: `${apiRoot}/companies`,
-    transformer: transformers.array,
-    crud: true,
+const rest = axios.create({
+  baseURL: apiHost,
+  headers
+});
+rest.interceptors.response.use(null, function(error) {
+  if (error.response.status === 401) {
+    localStorage.removeItem('auth_token');
+    window.location.reload();
   }
-
-  // Endpoint which returns an object (data defaults to {})
-  profile: {
-    url: `${apiRoot}/profile`,
-    crud: true,
-  }
-  */
-
-  auth: {
-    url: `${apiRoot}/login/`,
-    transformer: (data = {}) => {
-      if (data.token) {
-        return {
-          ...data
-        };
-      }
-      return data;
-    },
-
-    options: {
-      method: 'POST',
-    },
-  },
-})
-.use('options', (url, params, getState) => {
-  const { auth: { data: { token } } } = getState();
-
-  const headers = {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-  };
-
-  // Add token to request headers
-  if (token) {
-    return { headers: { ...headers, Authorization: `${token}` } };
-  }
-
-  return { headers };
-})
-.use('fetch', adapterFetch(fetch))
-.use('responseHandler', (err) => {
-  if (err) {
-    let msg = 'Error';
-
-    // error code
-    msg += err.statusCode ? ` ${err.statusCode}` : '';
-
-    // error reason
-    msg += err.error ? ` ${err.error}` : '';
-
-    // error description
-    msg += err.message ? `: ${err.message}` : '';
-
-    console.error('Error:', msg)
-    // store.dispatch(showError({
-    //   msg,
-    //   details: JSON.stringify(err, Object.getOwnPropertyNames(err), 4),
-    // }));
-
-    throw err;
-  }
+  return Promise.reject(error);
 });
 
 export default rest;
-export const reducers = rest.reducers;

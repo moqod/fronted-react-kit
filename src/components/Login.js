@@ -1,15 +1,27 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { updateIntl } from 'react-intl-redux';
-
-import { FormattedMessage, injectIntl } from 'react-intl';
-
+import styled from 'styled-components';
+import { injectIntl } from 'react-intl';
 import { Redirect } from 'react-router-dom';
 
-import { getLocaleForUser, languages } from '../utils/intl';
+import * as actions from './../actions/authActions'
 
-import './Login.css';
-import rest from '../utils/rest'
+const Form = styled.form`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+`;
+
+const Input = styled.input`
+  margin-top: 10px;
+`;
+
+const SubmitButton = styled.button`
+  margin-top: 20px;
+`;
 
 class Login extends Component {
   state = {
@@ -19,7 +31,7 @@ class Login extends Component {
   };
 
   shouldComponentUpdate(props) {
-    if (props.auth.data && props.auth.data.token && !this.state.redirectToReferrer) {
+    if (props.auth && props.auth.token && !this.state.redirectToReferrer) {
       this.setState({ redirectToReferrer: true })
       return false;
     }
@@ -31,16 +43,22 @@ class Login extends Component {
       [field]: event.target.value,
     });
   }
+
+  login(e) {
+    e.preventDefault();
+    const { dispatch } = this.props;
+    const { username, password } = this.state;
+    dispatch(actions.login(username, password))
+  }
   
   render() {
     const { from } = this.props.location.state || { from: { pathname: '/' } }
     const { redirectToReferrer } = this.state
-    // const { intl: { formatMessage } } = this.props;
 
-    const { auth } = this.props;
+    const { auth, intl } = this.props;
+    const messages = intl.messages;
     const loading = auth ? auth.loading : false;
-    const progress = loading ? <p>Loading...</p> : null;
-    console.log('Render Login', redirectToReferrer, from)
+    console.log('Render Login', redirectToReferrer, from, auth)
     if (redirectToReferrer) {
       return (
         <Redirect to={from}/>
@@ -48,8 +66,8 @@ class Login extends Component {
     }
     
     return (
-      <div className="login-form">
-        <input  name="username"
+      <Form noValidate autoComplete="off">
+        <Input  name="username"
                 placeholder="Username"
                 onChange={(event) => {
                   if (event.keyCode !== 13) {
@@ -61,8 +79,8 @@ class Login extends Component {
                     this.props.doLogin({ username: this.state.username, password: this.state.password });
                   }
                 }}>
-        </input>
-        <input  name="password"
+        </Input>
+        <Input  name="password"
                 placeholder="Password"
                 onChange={(event) => {
                   if (event.keyCode !== 13) {
@@ -74,34 +92,19 @@ class Login extends Component {
                     this.props.doLogin({ username: this.state.username, password: this.state.password });
                   }
                 }}>
-        </input>
-        <button onClick={() =>
-                  this.props.doLogin({ username: this.state.username, password: this.state.password, app: 'editor'})
+        </Input>
+        <SubmitButton onClick={(e) =>
+                  this.login(e)
                 }>
-            <FormattedMessage id="Login" />
-        </button>
-        {progress}
-      </div>
+            {loading ? messages["Loading"] : messages["Login"]}
+        </SubmitButton>
+      </Form>
     );
   }
 }
-
-const mapDispatchToProps = dispatch => ({
-  doLogin(creds) {
-    dispatch(rest.actions.auth({}, { body: JSON.stringify(creds) }));
-
-    const storedLocale = getLocaleForUser(creds.email);
-    if (storedLocale && languages[storedLocale]) {
-      dispatch(updateIntl({
-        locale: storedLocale,
-        messages: languages[storedLocale].translations,
-      }));
-    }
-  }
-});
 
 const mapStateToProps = (state) => ({
   auth: state.auth
 });
 
-export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(Login));
+export default injectIntl(connect(mapStateToProps)(Login));

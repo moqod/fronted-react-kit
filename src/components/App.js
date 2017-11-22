@@ -1,22 +1,22 @@
 import React, { Component } from 'react';
+import { injectIntl } from 'react-intl';
 import logo from '../assets/logo.svg';
-import './App.css';
 
 class App extends Component {
+
+  logout() {
+    localStorage.removeItem('auth_token');
+    window.location.reload();
+  }
+
   render() {
-    console.log('Render main App')
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
+      <header className="App-header">
+        <h1>Welcome to React</h1>
+        <button onClick={() => this.logout()}>Logout</button>
+      </header>
     );
   }
 }
 
-export default App;
+export default injectIntl(App);
