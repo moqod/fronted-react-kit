@@ -22,5 +22,9 @@ and additionally includes:
 
 * [redux](http://redux.js.org/), predictable container for app state
 * [redux-thunk](https://github.com/gaearon/redux-thunk), async support for redux actions
-* [redux-api](https://github.com/lexich/redux-api), store REST API responses and status in redux
 * [redux-act](https://github.com/pauldijou/redux-act), use actions themselves as references inside reducers
+
+
+### Styling
+
+* [styled-components](https://www.styled-components.com) Use the best bits of ES6 and CSS to style your apps
